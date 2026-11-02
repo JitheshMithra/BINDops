@@ -51,7 +51,7 @@ Guards:
 3. A reload gate before generation, so a silent `strict=False` reload failure cannot void pretrained weights.
 4. Standard DockQ v2 rescoring (`rescore_dockq.py`), with unscoreable poses counted as 0, never dropped.
 
-Most variables are environment, for example:
+Most setting are environment variables, for example:
 
 ```bash
 W_CONTACT=1.0 CONTACT_CUTOFF=8.0     # contact loss
