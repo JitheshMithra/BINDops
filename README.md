@@ -4,6 +4,8 @@
 
 BINDops is a research codebase for peptide-protein docking. It adds receptor-side interface and contact information to a pretrained flow-matching peptide docking model, and it contains the gates, losses, and ablations used to test whether that information, and several architectural changes, actually improve where the peptide lands.
 
+BINDops does not compute or search for MSAs. The msa and all arms in scripts/run_full.sh consume precomputed UniRef90 alignments, reduced to 23 per-residue profile features (PSSM log-odds, entropy, gap fraction, depth) that feed the adapter. There is no MSA module, and the base model needs no alignment. 
+
 ## What's in here
 
 | Package | Purpose |
