@@ -2,7 +2,7 @@
   <img width="1280" height="389" alt="Thumbnail_Size_Guide_YouTube_Thumbnail_in_Blue_White_Neo_Digital_Style-removebg" src="https://github.com/user-attachments/assets/25732e73-b058-452f-b25c-5ad5cbb82051" />
 </p>
 <p align="center">
-  The code depends on DiffPepBuilder / DiffPepDock and a `speeddock` package (SpeedDock is not public). Neither is vendored here. You also need PyTorch, OpenFold, DockQ and ESM.
+  The code depends on DiffPepBuilder / DiffPepDock and a `speeddock` package (SpeedDock is not public). Neither is given here. You also need PyTorch, OpenFold, DockQ and ESM.
   
 >**This repo is for documentation and is not runnable as-is.** `run_full.sh` and several modules hardcode my machine paths (`/8TBDrive1/jithesh/docking_model`, `/8TBDrive2/DiffPepBuilder`, `~/bin/capped_run.sh`, `~/bin/gpu_lease.sh`). A runnable public release is   planned once the results justify it.
 
