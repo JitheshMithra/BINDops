@@ -1,6 +1,11 @@
 <p align="center">
   <img width="1280" height="389" alt="Thumbnail_Size_Guide_YouTube_Thumbnail_in_Blue_White_Neo_Digital_Style-removebg" src="https://github.com/user-attachments/assets/25732e73-b058-452f-b25c-5ad5cbb82051" />
 </p>
+<p align="center">
+  The code depends on DiffPepBuilder / DiffPepDock and a `speeddock` package (SpeedDock is not public). Neither is vendored here. You also need PyTorch, OpenFold, DockQ and ESM.
+  
+  **This repo is for documentation and is not runnable as-is.** `run_full.sh` and several modules hardcode my machine paths (`/8TBDrive1/jithesh/docking_model`, `/8TBDrive2/DiffPepBuilder`, `~/bin/capped_run.sh`, `~/bin/gpu_lease.sh`). A runnable public release is   planned once the results justify it.
+</p>
 
 BINDops is a research codebase for peptide-protein docking. It adds receptor-side interface and contact information to a pretrained flow-matching peptide docking model, and it contains the gates, losses, and ablations used to test whether that information, and several architectural changes, actually improve where the peptide lands.
 
@@ -46,12 +51,6 @@ Guards:
 3. A reload gate before generation, so a silent `strict=False` reload failure cannot void pretrained weights.
 4. Standard DockQ v2 rescoring (`rescore_dockq.py`), with unscoreable poses counted as 0, never dropped.
 
-## Setup
-
-The code depends on the DiffPepBuilder / DiffPepDock codebase and a `speeddock` package (speedock doesn't exist publically), neither of which is vendored here, plus PyTorch, OpenFold, DockQ, ESM, and Python stack.
-
-**This repo is not portable/fully public yet. Simply for documentation.** `run_full.sh` and several modules hardcode my machine paths (`/8TBDrive1/jithesh/docking_model`, `/8TBDrive2/DiffPepBuilder`, `~/bin/capped_run.sh`, `~/bin/gpu_lease.sh`). It will be fully public with access and support for all parts of this repo so anyone can run it once we achieve a considerable "win".
-
 Most variables are environment, for example:
 
 ```bash
@@ -78,20 +77,26 @@ Generate and score poses:
 PAIR_STACK=1 python bindops/inference/gen_poses_pair.py <ckpt> <csv> <outdir> [N] [steps] [--gpu G]
 python bindops/inference/rescore_dockq.py <poseset_dir> [nproc]
 ```
+## Results
+
+Blind evaluation with DockQ on 304 unseen complexes released after 2025. The best model is a weight soup, : **38.8% acceptable (oracle), 9.2% top-1**. RAPiDock is still the top-performing model on this test set, and 13 large targets are missing from every BINDops arm.
+
+- Starting the peptide at the true binding site only raised per-pose success within 10 Å from 0.8% to 2.9%. The sampler often moves the peptide away, so pose generation looks like the bottleneck, not placement.
+- The `msa` and `all` arms in `run_full.sh` are experimental and are not the soup. The recorded `all` arm outcome in the code comments is oracle DockQ 0.128 (26.2% acceptable), top-1 DockQ 0.035 (3.1%).
+- Interface predictors, v4 included, drop to about 0.54-0.61 AUROC on real peptide sites (n=51), and inverse coordination number alone ties the 185-feature v4 stack.
+- Evaluation sets are small. Treat single-target numbers as anecdotal.
 
 ## Status
 
 - The recorded outcome for the `all` arm in the code comments is oracle DockQ 0.128 (acceptable 26.2%) and top-1 DockQ 0.035 (3.1%). This is not a state-of-the-art result.
-- The first pair-stack arm came back null, and the earlier attempts to fix placement by adding coordinate terms are documented as null. The placement head is the newest attempt and should be treated as unproven until its results are in.
-- Fine-tuning bought pose diversity at the cost of per-pose quality. The checkpoint soup (`make_soup.py`) interpolates between the pretrained and fine-tuned weights to study that trade.
-- Interface predictors, including v4, drop to roughly 0.54-0.61 AUROC on real peptide sites (n=51), and inverse coordination number alone ties the 185-feature v4 stack. Conditioning on a better site score is not a given win.
+- Interface predictors, including v4, drop to roughly 0.54-0.61 AUROC on real peptide sites (n=51), and inverse coordination number alone ties the 185-feature v4 stack. 
 - Evaluation sets are small. Treat any single-target or small-n number as anecdotal, and report confidence intervals.
 
 ## Credits
 
 Built on DiffPepBuilder / DiffPepDock and RAPiDock ideas, and on the SpeedDock (not public) flow-matching training code.
 
-Thanks to Yash Bhargava, Johns Hopkins University, for constant support and mentorship with the project and its direction.
+Thanks to Yash Bhargava, Bhargava Systems Research inc., for constant support and mentorship with the project and its direction.
 
 ## License
 
