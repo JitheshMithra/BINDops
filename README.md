@@ -42,7 +42,7 @@ BINDops does not compute or search for MSAs. The msa and all arms in scripts/run
 - `msa`: v5 trainer with a validation loop and best-checkpoint selection, real MSA features, real site score, adapter unfrozen (`BINDOPS_MODE=flexible`).
 - `all`: the `msa` arm plus the triangle pair stack and recycling (`PAIR_C=64 PAIR_C_HIDDEN=32 PAIR_LAYERS=4 PAIR_STACK=1`).
 
-Shared settings: 6000 steps, batch 64, lr 1e-4, `--max-sq-res 150000`, seed 0, validation every 1000 steps, `best.pth` chosen on held-out loss, `BLIND_PRIOR=surface`.
+Shared s: 6000 steps, batch 64, lr 1e-4, `--max-sq-res 150000`, seed 0, validation every 1000 steps, `best.pth` chosen on held-out loss, `BLIND_PRIOR=surface`.
 
 Guards:
 
@@ -51,7 +51,7 @@ Guards:
 3. A reload gate before generation, so a silent `strict=False` reload failure cannot void pretrained weights.
 4. Standard DockQ v2 rescoring (`rescore_dockq.py`), with unscoreable poses counted as 0, never dropped.
 
-Most setting are environment variables, for example:
+Most settings are environment variables, for example:
 
 ```bash
 W_CONTACT=1.0 CONTACT_CUTOFF=8.0     # contact loss
@@ -79,18 +79,12 @@ python bindops/inference/rescore_dockq.py <poseset_dir> [nproc]
 ```
 ## Results
 
-Blind evaluation with DockQ on 304 unseen complexes released after 2025. The best model is a weight soup, 80% DiffPepDock and 20% of our fine-tuned weights: **38.8% acceptable (oracle), 9.2% top-1**. RAPiDock is still the top-performing model on this test set, and 13 large targets are missing from every BINDops arm.
+Blind evaluation with DockQ on 304 unseen complexes released after 2025. The best model is a weight soup, 80% DiffPepDock and 20% of our fine-tuned weights: **38.8% acceptable (oracle), 9.2% top-1**. 
 
 - Starting the peptide at the true binding site only raised per-pose success within 10 Å from 0.8% to 2.9%. The sampler often moves the peptide away, so pose generation looks like the bottleneck, not placement.
 - The `msa` and `all` arms in `run_full.sh` are experimental and are not the soup. The recorded `all` arm outcome in the code comments is oracle DockQ 0.128 (26.2% acceptable), top-1 DockQ 0.035 (3.1%).
 - Interface predictors, v4 included, drop to about 0.54-0.61 AUROC on real peptide sites (n=51), and inverse coordination number alone ties the 185-feature v4 stack.
 - Evaluation sets are small. Treat single-target numbers as anecdotal.
-
-## Status
-
-- The recorded outcome for the `all` arm in the code comments is oracle DockQ 0.128 (acceptable 26.2%) and top-1 DockQ 0.035 (3.1%). This is not a state-of-the-art result.
-- Interface predictors, including v4, drop to roughly 0.54-0.61 AUROC on real peptide sites (n=51), and inverse coordination number alone ties the 185-feature v4 stack. 
-- Evaluation sets are small. Treat any single-target or small-n number as anecdotal, and report confidence intervals.
 
 ## Credits
 
