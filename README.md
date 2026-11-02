@@ -21,17 +21,15 @@ BINDops does not compute or search for MSAs. The msa and all arms in scripts/run
 
 ## Method
 
-## Method
+**Adapter.** We feed a per-residue interface probability into the frozen DiffPepDock score network through a small MLP. The last layer starts at zero, so at step 0 the model gives exactly the same output as the one without conditioning. `verify_flow_wiring.py` checks that instead of trusting it.
 
-**Conditioned adapter.** A small MLP maps a per-residue receptor interface probability (from ESM2-650M) into the node-embedding space of the pretrained score network. The last layer is zero-initialised, so at step 0 the conditioned model is bit-for-bit the unconditioned one. `verify_flow_wiring.py` checks this.
+**Pair stack.** DiffPepBuilder updates edge (i,j) from its two endpoint nodes only, so it never sees edges (i,k) and (k,j). We added a small triangle-multiplicative stack before the IPA trunk (no triangle attention, gradient checkpointed to fit on a P100). Its output projection also starts at zero so the warm start isn't lost. The first run with it did nothing, because nothing in the loss used pair information. `contact_loss.py` fixes that with a contact target between peptide and receptor residues (pseudo-CB under 8 Å).
 
-**Pair stack.** DiffPepBuilder's edge representation cannot see edge (i,k) and edge (k,j) when updating edge (i,j). A low-rank triangle-multiplicative stack (AlphaFold2 style, no triangle attention, gradient checkpointed) is inserted before the IPA trunk with a zero-initialised output projection, so the warm start survives. `contact_loss.py` gives it a pair-shaped BCE target (peptide residue i vs receptor residue j, pseudo-CB < 8 Å), because the first pair-stack arm was null: nothing read it.
+**What went wrong with fine-tuning.** Our fine-tuned weights squeezed the peptide: consecutive Cα–Cα distance dropped to 2.52 Å when real peptides sit at 3.81 Å. FAPE was only 0.129% of the training loss, and backbone L2 made up almost all of the rest. We tried an interface FAPE (receptor frames, peptide points) because the stock FAPE can't tell where the peptide sits on the receptor. We also tried a bond-length term. It fixed the bond geometry and made docking worse, so a better-shaped peptide still ended up in the wrong place.
 
-**Loss experiments.** Fine-tuning compressed consecutive Cα–Cα spacing to 2.52 Å against 3.81 Å in native peptides, and FAPE contributed only 0.129% of training loss, with backbone L2 dominating. Interface FAPE (receptor frames, peptide points) was added because the stock peptide-only FAPE cannot see where the peptide sits. A rotation- and translation-invariant bond term was added to restore chain geometry. It improved bond geometry but made docking worse, so better shape did not fix location.
+**Placement head (experimental).** The score network is good at refining a pose and bad at moving a whole peptide to another patch. The head points at a receptor Cα and adds a radial offset, so it stays equivariant. `place_loss.py` trains it with a pointer cross-entropy plus a Huber centroid term. It's built and gated but we haven't tested it end to end, and it isn't in the poster results.
 
-**Placement head (experimental, not in reported results).** Per-residue updates refine a pose well but move a whole peptide poorly. The head predicts a pointer over receptor Cα atoms plus a radial offset, and is equivariant by construction. `place_loss.py` combines a pointer cross-entropy with a Huber centroid term. It is implemented and gated, but untested end to end.
-
-**Features.** A real site score replaces the literal zeros that earlier arms carried, and a contact-map gate tests whether the contact map is predictable from ESM before any docking is attempted. Optional arms also use precomputed UniRef90 profiles (log-odds, entropy, gap fraction, depth). BINDops does not compute MSAs itself.
+**Features.** The site score is a real one now, where earlier arms had all zeros. `cmap_gate.py` checks whether ESM alone can predict the contact map before we try docking. Some arms also use UniRef90 profiles (log-odds, entropy, gap fraction, depth) that were computed outside this repo. BINDops doesn't build MSAs.
 
 ## Pipeline
 
