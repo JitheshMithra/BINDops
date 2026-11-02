@@ -89,7 +89,7 @@ Blind evaluation with DockQ on 304 unseen complexes released after 2025. The bes
 
 Built on DiffPepBuilder / DiffPepDock and RAPiDock ideas, and on the SpeedDock (not public) flow-matching training code.
 
-Thanks to Yash Bhargava, Bhargava Systems Research inc., for constant support and mentorship with the project and its direction.
+Thanks to Yash Bhargava, Bhargava Systems Research Inc., for constant support and mentorship with the project and its direction.
 
 ## License
 
