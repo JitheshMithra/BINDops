@@ -9,8 +9,7 @@
 
 BINDops is a research codebase for peptide-protein docking. It adds receptor-side interface and contact information to a pretrained flow-matching peptide docking model, and it contains the gates, losses, and ablations used to test whether that information, and several architectural changes, actually improve where the peptide lands.
 
-BINDops does not compute or search for MSAs. The msa and all arms in scripts/run_full.sh consume precomputed UniRef90 alignments, reduced to 23 per-residue profile features (PSSM log-odds, entropy, gap fraction, depth) that feed the adapter. There is no MSA module, and the base model needs no alignment. 
-
+BINDops does not compute or search for MSAs. The msa and all arms in scripts/run_full.sh consume precomputed UniRef90 alignments, reduced to 23 per-residue profile features (PSSM log-odds, entropy, gap fraction, depth) that feed the adapter. 
 ## What's in here
 
 | Package | Purpose |
@@ -42,7 +41,7 @@ BINDops does not compute or search for MSAs. The msa and all arms in scripts/run
 - `msa`: v5 trainer with a validation loop and best-checkpoint selection, real MSA features, real site score, adapter unfrozen (`BINDOPS_MODE=flexible`).
 - `all`: the `msa` arm plus the triangle pair stack and recycling (`PAIR_C=64 PAIR_C_HIDDEN=32 PAIR_LAYERS=4 PAIR_STACK=1`).
 
-Shared s: 6000 steps, batch 64, lr 1e-4, `--max-sq-res 150000`, seed 0, validation every 1000 steps, `best.pth` chosen on held-out loss, `BLIND_PRIOR=surface`.
+Shared settings: 6000 steps, batch 64, lr 1e-4, `--max-sq-res 150000`, seed 0, validation every 1000 steps, `best.pth` chosen on held-out loss, `BLIND_PRIOR=surface`.
 
 Guards:
 
