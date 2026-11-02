@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="1349" height="388" alt="image" src="https://github.com/user-attachments/assets/a3d43375-d48f-4d1d-93af-16f6f32b86b5" />
+  <img width="666" height="375" alt="Thumbnail_Size_Guide_YouTube_Thumbnail_in_Blue_White_Neo_Digital_Style-removebg-preview" src="https://github.com/user-attachments/assets/8bd04db5-3fa0-43eb-afea-8e52939cf3ce" />
 </p>
 
 BINDops is a research codebase for peptide-protein docking. It adds receptor-side interface and contact information to a pretrained flow-matching peptide docking model, and it contains the gates, losses, and ablations used to test whether that information, and several architectural changes, actually improve where the peptide lands.
