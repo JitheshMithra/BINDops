@@ -79,7 +79,7 @@ python bindops/inference/rescore_dockq.py <poseset_dir> [nproc]
 ```
 ## Results
 
-Blind evaluation with DockQ on 304 unseen complexes released after 2025. The best model is a weight soup, : **38.8% acceptable (oracle), 9.2% top-1**. RAPiDock is still the top-performing model on this test set, and 13 large targets are missing from every BINDops arm.
+Blind evaluation with DockQ on 304 unseen complexes released after 2025. The best model is a weight soup, 80% DiffPepDock and 20% of our fine-tuned weights: **38.8% acceptable (oracle), 9.2% top-1**. RAPiDock is still the top-performing model on this test set, and 13 large targets are missing from every BINDops arm.
 
 - Starting the peptide at the true binding site only raised per-pose success within 10 Å from 0.8% to 2.9%. The sampler often moves the peptide away, so pose generation looks like the bottleneck, not placement.
 - The `msa` and `all` arms in `run_full.sh` are experimental and are not the soup. The recorded `all` arm outcome in the code comments is oracle DockQ 0.128 (26.2% acceptable), top-1 DockQ 0.035 (3.1%).
