@@ -21,15 +21,17 @@ BINDops does not compute or search for MSAs. The msa and all arms in scripts/run
 
 ## Method
 
-**Conditioned adapter.** A small MLP maps a per-residue receptor interface score into the node-embedding space of a frozen pretrained score network. The last layer is zero-initialised, so at step 0 the conditioned model is bit-for-bit the unconditioned one. `verify_flow_wiring.py` checks it.
+## Method
 
-**Pair stack.** DiffPepBuilder's edge representation cannot see edge (i,k) and edge (k,j) when updating edge (i,j). A low-rank triangle-multiplicative stack (AlphaFold2 style, no triangle attention, gradient checkpointed) is inserted before the IPA trunk with a zero-initialised output projection, so the warm start survives. `contact_loss.py` gives it a pair-shaped BCE target (peptide residue i vs receptor residue j, pseudo-CB < 8 A) because the first pair-stack arm was null: nothing read it.
+**Conditioned adapter.** A small MLP maps a per-residue receptor interface probability (from ESM2-650M) into the node-embedding space of the pretrained score network. The last layer is zero-initialised, so at step 0 the conditioned model is bit-for-bit the unconditioned one. `verify_flow_wiring.py` checks this.
 
-**Global placement head.** Per-residue updates are good at refining a pose and poor at moving a whole peptide to a new patch. The head predicts a pointer over receptor CA atoms plus a radial offset, so its output is equivariant by construction (it is built from input coordinates, with only scalar gates read off invariant features). `place_loss.py` combines a pointer cross-entropy with a Huber centroid term.
+**Pair stack.** DiffPepBuilder's edge representation cannot see edge (i,k) and edge (k,j) when updating edge (i,j). A low-rank triangle-multiplicative stack (AlphaFold2 style, no triangle attention, gradient checkpointed) is inserted before the IPA trunk with a zero-initialised output projection, so the warm start survives. `contact_loss.py` gives it a pair-shaped BCE target (peptide residue i vs receptor residue j, pseudo-CB < 8 Å), because the first pair-stack arm was null: nothing read it.
 
-**Loss fixes.** Interface FAPE (receptor frames, peptide points) replaces a peptide-only FAPE that is mathematically blind to where the peptide sits. A rotation- and translation-invariant bond term targets the peptide chain contraction seen after fine-tuning (median CA-CA 2.55 A against 3.81 A native, in the repo's own measurement). The Huber reshape of the backbone term fixes gradient share but, per the code's own gate, does not stop contraction by itself.
+**Loss experiments.** Fine-tuning compressed consecutive Cα–Cα spacing to 2.52 Å against 3.81 Å in native peptides, and FAPE contributed only 0.129% of training loss, with backbone L2 dominating. Interface FAPE (receptor frames, peptide points) was added because the stock peptide-only FAPE cannot see where the peptide sits. A rotation- and translation-invariant bond term was added to restore chain geometry. It improved bond geometry but made docking worse, so better shape did not fix location.
 
-**Features.** Per-residue MSA profiles from UniRef90 (log-odds, entropy, gap fraction, log depth), a real site score replacing literal zeros, and a contact-map gate that tests whether the contact map is predictable from ESM before any docking is attempted.
+**Placement head (experimental, not in reported results).** Per-residue updates refine a pose well but move a whole peptide poorly. The head predicts a pointer over receptor Cα atoms plus a radial offset, and is equivariant by construction. `place_loss.py` combines a pointer cross-entropy with a Huber centroid term. It is implemented and gated, but untested end to end.
+
+**Features.** A real site score replaces the literal zeros that earlier arms carried, and a contact-map gate tests whether the contact map is predictable from ESM before any docking is attempted. Optional arms also use precomputed UniRef90 profiles (log-odds, entropy, gap fraction, depth). BINDops does not compute MSAs itself.
 
 ## Pipeline
 
