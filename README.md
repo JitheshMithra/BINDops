@@ -4,8 +4,8 @@
 <p align="center">
   The code depends on DiffPepBuilder / DiffPepDock and a `speeddock` package (SpeedDock is not public). Neither is vendored here. You also need PyTorch, OpenFold, DockQ and ESM.
   
-  **This repo is for documentation and is not runnable as-is.** `run_full.sh` and several modules hardcode my machine paths (`/8TBDrive1/jithesh/docking_model`, `/8TBDrive2/DiffPepBuilder`, `~/bin/capped_run.sh`, `~/bin/gpu_lease.sh`). A runnable public release is   planned once the results justify it.
-</p>
+>**This repo is for documentation and is not runnable as-is.** `run_full.sh` and several modules hardcode my machine paths (`/8TBDrive1/jithesh/docking_model`, `/8TBDrive2/DiffPepBuilder`, `~/bin/capped_run.sh`, `~/bin/gpu_lease.sh`). A runnable public release is   planned once the results justify it.
+
 
 BINDops is a research codebase for peptide-protein docking. It adds receptor-side interface and contact information to a pretrained flow-matching peptide docking model, and it contains the gates, losses, and ablations used to test whether that information, and several architectural changes, actually improve where the peptide lands.
 
